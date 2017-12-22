@@ -1,0 +1,47 @@
+syms t;
+P=40;  %perioada semnalului triunghiular
+N=50; %numar de coeficienti
+D=16; %durata semnalului triunghiular
+t1=0:0.2:80;
+w0=2*pi/P; %pulsatia semnalului triunghiular
+s=0.5*sawtooth(w0*t1, 0.4)+0.5; %semnalul teriunghiular initial
+s1=t*1/24; %dreapta crescatoare
+s2=-(t/16)+5; %dreapta descrescatoare
+X0=int(s1, t, 0, P-D) + int(s2, t, P-D, P); %componenta continua
+disp('X0= ');
+disp(X0);
+a=zeros(1, N); %initializarea amplitudinilor
+freq= zeros(1, N); %initializarea frecventelor
+y=0; %initializarea semnaluui reconstruit
+for k=1:N
+    f1=s1*exp(-1j*w0*k*t);
+    f2=s2*exp(-1j*w0*k*t);
+    Xk=int(f1, t, 0, P-D)+ int(f2, t, P-D, P);
+    a(k)=sqrt((imag(Xk))^2+(real(Xk))^2);
+    freq(k)=k/P;
+    S=['X',num2str(k), '='];
+    disp(S);
+    disp(Xk);
+    y=y+2*1/P*(Xk*exp(1j*k*w0*t1));
+end;
+y1=y+1/P*X0;
+figure(1)
+stem(0, X0);
+hold on
+stem(-freq, a, 'r')
+hold on
+stem(-freq, a, 'b')
+title('Spectrul de amplitudini');
+xlim([-N/P N/P])
+figure(2)
+plot(t1, s, 'g');
+hold on
+plot(t1, y1, '--r');
+title('Semnalul initial si cel reconstruit')
+legend('Semnal initial', 'Semnal reconstruit')
+axis([0 80 -2 2])
+
+
+
+    
+    
